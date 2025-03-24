@@ -1,70 +1,54 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Card, Button, ProgressBar } from 'react-native-paper';
-
-interface Activity {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  type: 'math' | 'reading' | 'memory';
-}
-
-const activities: Activity[] = [
-  {
-    id: '1',
-    title: 'Number Recognition',
-    description: 'Learn to identify numbers through fun games',
-    progress: 0.6,
-    type: 'math',
-  },
-  {
-    id: '2',
-    title: 'Letter Sounds',
-    description: 'Practice phonics and letter recognition',
-    progress: 0.3,
-    type: 'reading',
-  },
-  {
-    id: '3',
-    title: 'Pattern Memory',
-    description: 'Enhance memory skills with pattern matching',
-    progress: 0.8,
-    type: 'memory',
-  },
-];
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Button } from 'react-native-paper';
+import DiagnosticActivity from '../components/DiagnosticActivity';
+import ReadingActivity from '../components/activities/ReadingActivity';
 
 const LearningScreen = () => {
-  const renderActivityCard = (activity: Activity) => (
-    <Card key={activity.id} style={styles.activityCard}>
-      <Card.Content>
-        <Text variant="titleLarge">{activity.title}</Text>
-        <Text variant="bodyMedium" style={styles.description}>
-          {activity.description}
-        </Text>
-        <View style={styles.progressContainer}>
-          <Text variant="bodySmall" style={styles.progressText}>
-            Progress: {Math.round(activity.progress * 100)}%
-          </Text>
-          <ProgressBar progress={activity.progress} style={styles.progressBar} />
-        </View>
-        <Button 
-          mode="contained" 
-          onPress={() => {}}
-          style={styles.startButton}
-        >
-          Continue Learning
-        </Button>
-      </Card.Content>
-    </Card>
+  const [activeActivity, setActiveActivity] = useState<'diagnostic' | 'reading' | null>(null);
+
+  const renderActivitySelector = () => (
+    <View style={styles.selectorContainer}>
+      <Button
+        mode="contained"
+        onPress={() => setActiveActivity('diagnostic')}
+        style={styles.activityButton}
+      >
+        Start Diagnostic Assessment
+      </Button>
+      <Button
+        mode="contained"
+        onPress={() => setActiveActivity('reading')}
+        style={styles.activityButton}
+      >
+        Start Reading Activity
+      </Button>
+    </View>
   );
+
+  const renderActivity = () => {
+    switch (activeActivity) {
+      case 'diagnostic':
+        return <DiagnosticActivity />;
+      case 'reading':
+        return <ReadingActivity />;
+      default:
+        return renderActivitySelector();
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
-      <Text variant="headlineMedium" style={styles.header}>
-        Learning Activities
-      </Text>
-      {activities.map(renderActivityCard)}
+      {activeActivity && (
+        <Button
+          mode="outlined"
+          onPress={() => setActiveActivity(null)}
+          style={styles.backButton}
+        >
+          Back to Activities
+        </Button>
+      )}
+      {renderActivity()}
     </ScrollView>
   );
 };
@@ -73,31 +57,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  selectorContainer: {
     padding: 16,
+    gap: 16,
   },
-  header: {
-    marginBottom: 16,
+  activityButton: {
+    marginBottom: 8,
   },
-  activityCard: {
-    marginBottom: 16,
-    backgroundColor: '#fff',
-  },
-  description: {
-    marginTop: 8,
-    color: '#666',
-  },
-  progressContainer: {
-    marginTop: 16,
-  },
-  progressText: {
-    marginBottom: 4,
-  },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
-  },
-  startButton: {
-    marginTop: 16,
+  backButton: {
+    margin: 16,
   },
 });
 
